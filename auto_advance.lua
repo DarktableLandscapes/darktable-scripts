@@ -12,7 +12,7 @@ local function move_to_next_image()
 end
 
 -- Function that handles rating or rejecting and moves to the next image if auto-advance is enabled
-local function on_keypress_rating_or_reject(key, modifiers)
+local function on_keypress_rating_or_reject(event, key, modifiers)
   if auto_advance_enabled then
     -- Check if the key press is a rating (1 to 5) or rejection (r)
     if key >= 49 and key <= 53 then -- Keys '1' to '5' for rating
@@ -34,7 +34,7 @@ local function toggle_auto_advance()
 end
 
 -- Register a shortcut to toggle auto-advance
-dt.register_event("shortcut", toggle_auto_advance)
+dt.register_event("shortcut", "toggle_auto_advance", toggle_auto_advance)
 
 -- Register a keyboard event to listen for rating and rejection keys
 dt.register_event("key-pressed", on_keypress_rating_or_reject)
