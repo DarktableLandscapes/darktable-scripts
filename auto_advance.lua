@@ -34,7 +34,7 @@ local function toggle_auto_advance()
 end
 
 -- Register a shortcut to toggle auto-advance
-dt.register_event("shortcut", "toggle_auto_advance", toggle_auto_advance)
+dt.register_event("shortcut", toggle_auto_advance)
 
 -- Register a keyboard event to listen for rating and rejection keys
 dt.register_event("key-pressed", on_keypress_rating_or_reject)
