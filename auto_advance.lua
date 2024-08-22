@@ -1,43 +1,26 @@
+-- Import Darktable Lua API
 local dt = require "darktable"
 
--- Variable to control whether auto-advance is enabled
-local auto_advance_enabled = true -- Set this to true if you want auto-advance enabled by default
+-- Store the last known rating for the currently viewed image
+local last_rating = nil
 
--- Function to move to the next image
-local function move_to_next_image()
-  local images = dt.gui.selection()
-  if #images > 0 then
-    dt.gui.action("lighttable|next")
-  end
-end
+-- Function to auto-advance when the rating changes
+local function check_rating_change()
+  -- Get the currently selected image
+  local current_image = dt.gui.action_images.get_current()
 
--- Function that handles rating or rejecting and moves to the next image if auto-advance is enabled
-local function on_keypress_rating_or_reject(event, key, modifiers)
-  if auto_advance_enabled then
-    -- Check if the key press is a rating (1 to 5) or rejection (r)
-    if key >= 49 and key <= 53 then -- Keys '1' to '5' for rating
-      move_to_next_image()
-    elseif key == 114 then -- Key 'r' for reject
-      move_to_next_image()
+  if current_image then
+    -- Check if the rating has changed
+    if last_rating ~= current_image.rating then
+      last_rating = current_image.rating
+     
+        dt.gui.action_images.next()
+      
     end
   end
 end
 
--- Function to toggle auto-advance on or off
-local function toggle_auto_advance()
-  auto_advance_enabled = not auto_advance_enabled
-  if auto_advance_enabled then
-    dt.print("Auto-advance enabled")
-  else
-    dt.print("Auto-advance disabled")
-  end
-end
-
--- Register a shortcut to toggle auto-advance
-dt.register_event("shortcut", toggle_auto_advance)
-
--- Register a keyboard event to listen for rating and rejection keys
-dt.register_event("key-pressed", on_keypress_rating_or_reject)
-
--- Notify that the script has been loaded
-dt.print("Auto-advance script loaded! Use the shortcut to toggle auto-advance.")
+-- Register the timer to periodically check for rating changes
+dt.register_event("post-export", function()
+  dt.gui.libs.ratings.connect_signal("changed", check_rating_change)
+end)
